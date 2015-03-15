@@ -149,6 +149,11 @@ def parse_player_table(soup, id, expected_len, season):
     return ret
 
 
+def num_lines(fname):
+    with open(fname) as f:
+        return len(f.readlines())
+
+
 def populate_players_stats(team_id, season):
     fname = '../data/generated/team_players/%s_%s.txt' % (team_id, season)
     fout = '../data/generated/team_players/%s_%s_data.txt' % (team_id, season)
@@ -157,8 +162,11 @@ def populate_players_stats(team_id, season):
         return
 
     if os.path.exists(fout) and os.path.getsize(fout) > 0:
-        #print "Skipping %s %s, as the corresponding output file already exists" % (team_id, season)
-        return
+        if num_lines(fout) != 5 * num_lines(fname):
+            pass
+        else:
+            #print "Skipping %s %s, as the corresponding output file already exists" % (team_id, season)
+            return
 
     player_ordinal = 0
     with open(fname) as f:
@@ -182,3 +190,19 @@ def populate_all_teams_players_stats(season):
     for id, name in id_name:
         print "Populating for %s (%s)" % (name, season)
         populate_players_stats(id, season)
+
+
+def number_of_players_per_team(): # helper to get min and max number of players per team
+    id_name = get_kaggle_teams()
+    mn = 100
+    mx = 0
+    for season in range(2011, 2016):
+        for team_id, name in id_name:
+            fname = '../data/generated/team_players/%s_%s_data.txt' % (team_id, season)
+            if not os.path.exists(fname):
+                continue
+            with open(fname) as f:
+                x = len(f.readlines())
+                if x < mn: mn = x
+                if x > mx: mx = x
+    print mn / 5, mx / 5
