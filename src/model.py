@@ -95,7 +95,6 @@ def score_diff_to_output(a, b):
     x = a - b
     if x < -20: x = -20
     if x > 20: x = 20
-    return x / 20.0
     return (x + 20) / 40.0
 
 
@@ -121,6 +120,12 @@ def get_training_data(season):
             continue
         X.append(xx)
         y.append((score_diff_to_output(game[3], game[4]),))
+
+        xx = get_features_vector(game[0], game[2], game[1], player_stats)
+        if xx is None:
+            assert False
+        X.append(xx)
+        y.append((score_diff_to_output(game[4], game[3]),))
 
     xMean = np.mean(X, axis=0)
     xStd = np.std(X, axis=0)
@@ -148,9 +153,9 @@ def train_net(X, y):
         ],
     input_shape = (None, num_features * 2),
     ncaa_num_units = 128,
-    dropout1_p=0.3,
+    dropout1_p=0.2,
     hidden_num_units=128,
-    dropout2_p=0.5,
+    dropout2_p=0.3,
     output_nonlinearity=nonlinearities.sigmoid,
     output_num_units=1,
 
@@ -159,7 +164,7 @@ def train_net(X, y):
     update_momentum=theano.shared(float32(0.9)),
 
     regression=True,  # flag to indicate we're dealing with regression problem
-    max_epochs=50,  # we want to train this many epochs
+    max_epochs=20,  # we want to train this many epochs
     verbose=1,
     )
 
