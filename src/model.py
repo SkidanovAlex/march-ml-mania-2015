@@ -172,7 +172,7 @@ def train_net(X, y):
     return net2
 
 
-def produce_output(net, mean, std):
+def produce_output(nets, mean, std):
     player_stats = load_players_stats()
     total = 0
     skipped = 0
@@ -195,7 +195,7 @@ def produce_output(net, mean, std):
                 features = np.array([features])
                 features = (features - mean) / std
                 features = features.astype(np.float32)
-                predicted = net.predict_proba(features)
+                predicted = nets[season].predict_proba(features)
                 fw.write("%s,%s\n" % (line.split(',')[0], predicted[0][0]))
 
     print total, skipped

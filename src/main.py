@@ -11,6 +11,9 @@ if __name__ == "__main__":
     #number_of_players_per_team()
     #print len(load_game_results())
     #pp.pprint(load_players_stats())
-    X, y, mean, std = get_training_data(2011)
-    net = train_net(X, y)
-    produce_output(net, mean, std)
+    nets = {}
+    for season in range(2011, 2016):
+        X, y, mean, std = get_training_data(season)
+        net = train_net(X, y)
+        nets[season] = net
+    produce_output(nets, mean, std)
