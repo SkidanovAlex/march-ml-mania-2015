@@ -4,7 +4,7 @@ from lasagne.utils import concatenate
 import numpy as np
 import theano.tensor as T
 
-ppt = 9
+ppt = 5
 
 class NCAALayer(Layer):
     def __init__(self, incoming, num_units, W=init.Uniform(),

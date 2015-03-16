@@ -12,7 +12,7 @@ import csv
 import os
 
 features_per_player = 110
-players_per_team = 9
+players_per_team = 5
 num_features = players_per_team * features_per_player
 
 
@@ -93,9 +93,10 @@ def load_players_stats(): # returns {('team_id', 'season'): [features...]}
 
 def score_diff_to_output(a, b):
     x = a - b
-    if x < -20: x = -20
-    if x > 20: x = 20
-    return (x + 20) / 40.0
+    return 1 if x > 0 else 0
+    #if x < -20: x = -20
+    #if x > 20: x = 20
+    #return (x + 20) / 40.0
 
 
 def get_features_vector(season, t1, t2, player_stats):
