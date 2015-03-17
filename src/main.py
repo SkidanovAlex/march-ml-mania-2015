@@ -1,4 +1,5 @@
 from model import *
+from bracket import predict_bracket_naive, predict_bracket_smart
 import pprint
 
 if __name__ == "__main__":
@@ -12,8 +13,8 @@ if __name__ == "__main__":
     #print len(load_game_results())
     #pp.pprint(load_players_stats())
     nets = {}
-    for season in range(2011, 2016):
-        X, y, mean, std = get_training_data(season)
-        net = train_net(X, y)
-        nets[season] = net
-    produce_output(nets, mean, std)
+    X, y, mean, std = get_training_data(2015)
+    net = train_net(X, y)
+    nets[2015] = net
+    #produce_output(nets, mean, std)
+    predict_bracket_smart(net, mean, std)

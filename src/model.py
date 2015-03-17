@@ -22,6 +22,7 @@ def float32(k):
 
 def load_game_results(): # return [(year, wteam, lteam, wscore, lscore)...]
     game_res = []
+    #for fname in ["../data/regular_season_compact_results.csv", "../data/tourney_compact_results.csv", "../data/regular_season_compact_results_2015_Sunday.csv"]:
     for fname in ["../data/regular_season_compact_results.csv", "../data/tourney_compact_results.csv"]:
         with open(fname) as f:
             reader = csv.reader(f)
@@ -177,8 +178,8 @@ def produce_output(nets, mean, std):
     player_stats = load_players_stats()
     total = 0
     skipped = 0
-    with open('../data/sample_submission.csv') as f:
-        with open('../data/submission.csv', 'w') as fw:
+    with open('../data/sample_submission_2015.csv') as f:
+        with open('../data/submission_2015.csv', 'w') as fw:
             lines = f.readlines()
             fw.write("%s\n" % lines[0])
             for line in lines[1:]:
