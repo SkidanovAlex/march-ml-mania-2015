@@ -1,5 +1,6 @@
 from model import get_features_vector
 from model import load_players_stats
+from model import regression
 from collect import get_kaggle_teams
 import csv
 import numpy as np
@@ -89,7 +90,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
             features = (features - mean) / std
             features = features.astype(np.float32)
             s2, p2 = rec(player_stats, net, mean, std, inv_seeds, bracket, x - 1, y * 2 + 1, t2, memo, False)
-            p += net.predict_proba(features) * p1 * p2
+            p += net.predict_proba(features)[0][0 if regression else 1] * p1 * p2
             if s2 > bestScore:
                 bestScore = s2
                 best = i
@@ -110,7 +111,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
             features = (features - mean) / std
             features = features.astype(np.float32)
             s2, p2 = rec(player_stats, net, mean, std, inv_seeds, bracket, x - 1, y * 2, t2, memo, False)
-            p += net.predict_proba(features) * p1 * p2
+            p += net.predict_proba(features)[0][0 if regression else 1] * p1 * p2
             if s2 > bestScore:
                 bestScore = s2
                 best = i
@@ -121,6 +122,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
 
     score = s1 + bestScore + p * (1 << x)
     assert best != -1
+    print p
     if p > 1: p = 1
     memo[(x, y, team)] = (score, p)
     return (score, p)
@@ -141,13 +143,15 @@ def predict_bracket_smart(net, mean, std):
 
     teams = [0 for x in range(64)]
     bracket = []
-    with open("../data/tourney_seeds_2015.csv") as f:
+    with open("../data/TourneySeeds.csv") as f:
         reader = csv.reader(f)
         next(reader)
         ord = 0
         qua = 0
         for row in reader:
             if row[1].endswith('b'):
+                continue
+            if int(row[0]) != 2016:
                 continue
             teams[qua + inv_seeds[ord]] = int(row[2])
             ord += 1

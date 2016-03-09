@@ -1,6 +1,6 @@
 from lasagne import nonlinearities, init
 from lasagne.layers import Layer
-from lasagne.utils import concatenate
+from theano.tensor import concatenate
 import numpy as np
 import theano.tensor as T
 
