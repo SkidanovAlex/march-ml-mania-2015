@@ -10,6 +10,7 @@ if __name__ == "__main__":
         #populate_team_players(season)
         #populate_all_teams_players_stats(season)
         #populate_coaches_stats_for_season(season)
+        #populate_team_stats_for_season(season)
         pass
     #number_of_players_per_team()
     #print len(load_game_results())

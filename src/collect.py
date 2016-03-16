@@ -135,7 +135,7 @@ def populate_team_players(season):
                     fw.write("%s\n" % href.replace('\xa0', '-'))
 
 
-def parse_player_table(soup, id, expected_len, season_or_url):
+def parse_player_table(soup, id, expected_len, season_or_url, ok_to_not_find=None):
     ret = ''
     div = soup.find(id=id)
     if div is None:
@@ -143,6 +143,7 @@ def parse_player_table(soup, id, expected_len, season_or_url):
         return ','.join(['0' for x in range(expected_len - 3)]) + '\n'
     div = div.tbody
     found = False
+    saw_good_len = False
     for tr in div.find_all('tr'):
         data = [td.text for td in tr.find_all('td')]
         if type(season_or_url) != int:
@@ -152,15 +153,45 @@ def parse_player_table(soup, id, expected_len, season_or_url):
 
         if len(data) == 30 and expected_len == 28:
             data = data[:28] # drop the awards
-        assert len(data) == expected_len, "%s != %s = len(%s)" % (expected_len, len(data), data)
-        if season_or_url in [normalize_url(a.get('href')) for a in tr.find_all('a')] or (type(season_or_url) == int and data[0] == "%s-%s" % (season_or_url - 1, season_or_url % 100)):
+        assert len(data) == expected_len or (len(data) == 0 and saw_good_len), "%s != %s = len(%s)" % (expected_len, len(data), data)
+        if len(data) == 0:
+            continue
+        saw_good_len = True
+        if season_or_url in [normalize_url(a.get('href')) for a in tr.find_all('a')] or (type(season_or_url) == int and "%s-%s" % (season_or_url - 1, season_or_url % 100) in data[0:2]):
             ret = ','.join(data[3:]) + '\n'
             assert not found
             found = True
     if not found:
-        assert type(season_or_url) != int or season_or_url == 2016
+        assert (ok_to_not_find is None and (type(season_or_url) != int or season_or_url == 2016)) or ok_to_not_find, season_or_url
         return ','.join(['0' for x in range(expected_len - 3)]) + '\n'
     return ret
+
+
+def populate_team_stats_for_season(season):
+    # for each team, populate player names into a file ../data/generated/team_players/<teamid>_<season>.txt, one url per line
+    # teams is {'kaggle' : "collected"}, as stored in hardcoded.py
+    id_name = get_kaggle_teams()
+    name_to_url = {}
+    for entry in get_teams():
+        name_to_url[entry['name']] = entry['url']
+
+    for id, name in id_name:
+        remote_name = kaggle_to_collected[name]
+        if remote_name is None:
+            continue
+
+        url = normalize_url(name_to_url[remote_name])
+        cached_page = '../data/generated/team_players/%s_team.html' % id
+        fname = '../data/generated/team_players/%s_%s_team.txt' % (id, season)
+
+        if not os.path.exists(fname) or True:
+            print url, season
+            soup = get_page_soup(url, cached_page)
+            with open(fname, 'w') as fw:
+                fw.write(parse_player_table(soup, [x for x in url.split('/') if len(x) > 0][-1], 15, season, ok_to_not_find=True))
+
+        else:
+            print "Skipping populating team stats for %s, as the file already exists" % remote_name
 
 
 def populate_coaches_stats_for_season(season):

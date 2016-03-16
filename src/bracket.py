@@ -36,9 +36,9 @@ def predict_bracket_naive(net, mean, std):
     bracket.append(teams)
     while len(teams) > 1:
         new_teams = []
-        print "--", len(teams)
+        #print "--", len(teams)
         for i in range(0, len(teams), 2):
-            print i
+            #print i
             t1 = teams[i]
             t2 = teams[i + 1]
             features = get_features_vector(2015, t1, t2, player_stats)
@@ -76,7 +76,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
     r = l + (1 << x)
     m = l + (1 << (x - 1))
     p = 0
-    print l, r, m
+    #print l, r, m
     if team < m:
         best = -1
         bestScore = -1
@@ -85,7 +85,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
             t1 = team
             t2 = i
             features = get_features_vector(2015, bracket[0][t1], bracket[0][t2], player_stats)
-            print t1, t2
+            #print t1, t2
             features = np.array([features])
             features = (features - mean) / std
             features = features.astype(np.float32)
@@ -106,7 +106,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
             t1 = team
             t2 = i
             features = get_features_vector(2015, bracket[0][t1], bracket[0][t2], player_stats)
-            print t1, t2
+            #print t1, t2
             features = np.array([features])
             features = (features - mean) / std
             features = features.astype(np.float32)
@@ -122,7 +122,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
 
     score = s1 + bestScore + p * (1 << x)
     assert best != -1
-    print p
+    #print p
     if p > 1: p = 1
     memo[(x, y, team)] = (score, p)
     return (score, p)

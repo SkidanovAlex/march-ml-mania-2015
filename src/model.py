@@ -1,5 +1,5 @@
 from lasagne import layers
-from custom_layers import NCAALayer
+from custom_layers import NCAALayer, team_features
 from lasagne import nonlinearities
 from lasagne.updates import nesterov_momentum
 from nolearn.lasagne import NeuralNet
@@ -11,12 +11,13 @@ import theano
 import csv
 import os
 
-regression = True
+regression = False
 
 features_per_player = 110
 players_per_team = 5
-num_features = players_per_team * features_per_player
+num_features = players_per_team * features_per_player + team_features
 
+coach_features = 6
 
 def float32(k):
     return np.cast['float32'](k)
@@ -91,6 +92,24 @@ def load_players_stats(): # returns {('team_id', 'season'): [features...]}
                                 features[pos] = float(token)
                             except ValueError as e:
                                 print '[', token, ']'
+            fname = '../data/generated/team_players/%s_%s_coach.txt' % (team_id, season)
+            with open(fname, 'r') as f:
+                total_lines = 0
+                for line in f.readlines():
+                    total_lines += 1
+                    tokens = [(float(x) if len(x) > 0 else 0.0) for x in line.split(',')[:coach_features]]
+                    for i in range(coach_features):
+                        features[features_per_player * players_per_team + i] += tokens[i]
+                if total_lines == 0:
+                    total_lines = 1
+                for i in range(coach_features):
+                    features[features_per_player * players_per_team + i] /= float(total_lines)
+            fname = '../data/generated/team_players/%s_%s_team.txt' % (team_id, season)
+            with open(fname, 'r') as f:
+                for line in f.readlines():
+                    tokens = [(float(x) if len(x) > 0 else 0.0) for x in line.split(',')[:team_features - coach_features]]
+                    for i in range(team_features - coach_features):
+                        features[features_per_player * players_per_team + coach_features + i] += tokens[i]
             ret[(int(team_id), season)] = features
 
     return ret
