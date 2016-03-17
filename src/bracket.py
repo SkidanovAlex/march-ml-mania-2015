@@ -41,7 +41,7 @@ def predict_bracket_naive(net, mean, std):
             #print i
             t1 = teams[i]
             t2 = teams[i + 1]
-            features = get_features_vector(2015, t1, t2, player_stats)
+            features = get_features_vector(2016, t1, t2, player_stats)
             if features is None:
                 assert False, "%s %s" % (t1, t2)
             features = np.array([features])
@@ -84,7 +84,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
         for i in range(m, r):
             t1 = team
             t2 = i
-            features = get_features_vector(2015, bracket[0][t1], bracket[0][t2], player_stats)
+            features = get_features_vector(2016, bracket[0][t1], bracket[0][t2], player_stats)
             #print t1, t2
             features = np.array([features])
             features = (features - mean) / std
@@ -105,7 +105,7 @@ def rec(player_stats, net, mean, std, inv_seeds, bracket, x, y, team, memo, fill
         for i in range(l, m):
             t1 = team
             t2 = i
-            features = get_features_vector(2015, bracket[0][t1], bracket[0][t2], player_stats)
+            features = get_features_vector(2016, bracket[0][t1], bracket[0][t2], player_stats)
             #print t1, t2
             features = np.array([features])
             features = (features - mean) / std
